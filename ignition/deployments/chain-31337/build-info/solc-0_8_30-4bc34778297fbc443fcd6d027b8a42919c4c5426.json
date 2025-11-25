@@ -1,0 +1,39 @@
+{
+  "_format": "hh3-sol-build-info-1",
+  "id": "solc-0_8_30-4bc34778297fbc443fcd6d027b8a42919c4c5426",
+  "solcVersion": "0.8.30",
+  "solcLongVersion": "0.8.30+commit.73712a01",
+  "userSourceNameMap": {
+    "contracts/BountyToken.sol": "project/contracts/BountyToken.sol"
+  },
+  "input": {
+    "language": "Solidity",
+    "settings": {
+      "evmVersion": "prague",
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "outputSelection": {
+        "*": {
+          "": [
+            "ast"
+          ],
+          "*": [
+            "abi",
+            "evm.bytecode",
+            "evm.deployedBytecode",
+            "evm.methodIdentifiers",
+            "metadata"
+          ]
+        }
+      },
+      "remappings": []
+    },
+    "sources": {
+      "project/contracts/BountyToken.sol": {
+        "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.30;\n\n/**\n * @title BountyToken\n * @dev ERC-20 token for bounty payments\n */\ncontract BountyToken {\n    string public name = \"Campus Bounty Token\";\n    string public symbol = \"CBT\";\n    uint8 public decimals = 18;\n    uint256 public totalSupply;\n    \n    address public owner;\n    \n    mapping(address => uint256) public balanceOf;\n    mapping(address => mapping(address => uint256)) public allowance;\n    \n    event Transfer(address indexed from, address indexed to, uint256 value);\n    event Approval(address indexed owner, address indexed spender, uint256 value);\n    event Mint(address indexed to, uint256 amount);\n    \n    modifier onlyOwner() {\n        require(msg.sender == owner, \"Not the owner\");\n        _;\n    }\n    \n    constructor(uint256 initialSupply) {\n        owner = msg.sender;\n        totalSupply = initialSupply * 10**decimals;\n        balanceOf[msg.sender] = totalSupply;\n        emit Transfer(address(0), msg.sender, totalSupply);\n    }\n    \n    /**\n     * @dev Transfer tokens\n     */\n    function transfer(address recipient, uint256 amount) public returns (bool) {\n        require(recipient != address(0), \"Transfer to zero address\");\n        require(balanceOf[msg.sender] >= amount, \"Insufficient balance\");\n        \n        balanceOf[msg.sender] -= amount;\n        balanceOf[recipient] += amount;\n        \n        emit Transfer(msg.sender, recipient, amount);\n        return true;\n    }\n    \n    /**\n     * @dev Approve spender\n     */\n    function approve(address spender, uint256 amount) public returns (bool) {\n        require(spender != address(0), \"Approve to zero address\");\n        \n        allowance[msg.sender][spender] = amount;\n        \n        emit Approval(msg.sender, spender, amount);\n        return true;\n    }\n    \n    /**\n     * @dev Transfer from allowance\n     */\n    function transferFrom(address sender, address recipient, uint256 amount) public returns (bool) {\n        require(recipient != address(0), \"Transfer to zero address\");\n        require(balanceOf[sender] >= amount, \"Insufficient balance\");\n        require(allowance[sender][msg.sender] >= amount, \"Insufficient allowance\");\n        \n        balanceOf[sender] -= amount;\n        balanceOf[recipient] += amount;\n        allowance[sender][msg.sender] -= amount;\n        \n        emit Transfer(sender, recipient, amount);\n        return true;\n    }\n    \n    /**\n     * @dev Mint new tokens (owner only)\n     */\n    function mint(address to, uint256 amount) public onlyOwner {\n        require(to != address(0), \"Mint to zero address\");\n        \n        totalSupply += amount;\n        balanceOf[to] += amount;\n        \n        emit Mint(to, amount);\n        emit Transfer(address(0), to, amount);\n    }\n    \n    /**\n     * @dev Airdrop tokens to new students\n     */\n    function airdrop(address[] memory students, uint256 amount) public onlyOwner {\n        for (uint256 i = 0; i < students.length; i++) {\n            require(students[i] != address(0), \"Invalid student address\");\n            mint(students[i], amount);\n        }\n    }\n    \n    /**\n     * @dev Burn tokens\n     */\n    function burn(uint256 amount) public {\n        require(balanceOf[msg.sender] >= amount, \"Insufficient balance\");\n        \n        balanceOf[msg.sender] -= amount;\n        totalSupply -= amount;\n        \n        emit Transfer(msg.sender, address(0), amount);\n    }\n}\n"
+      }
+    }
+  }
+}

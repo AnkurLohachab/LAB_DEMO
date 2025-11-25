@@ -1,0 +1,39 @@
+{
+  "_format": "hh3-sol-build-info-1",
+  "id": "solc-0_8_30-3aaaf8dc16dc1b54da1c0bb8b7b66fbb07e22bf3",
+  "solcVersion": "0.8.30",
+  "solcLongVersion": "0.8.30+commit.73712a01",
+  "userSourceNameMap": {
+    "contracts/ReputationNFT.sol": "project/contracts/ReputationNFT.sol"
+  },
+  "input": {
+    "language": "Solidity",
+    "settings": {
+      "evmVersion": "prague",
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "outputSelection": {
+        "*": {
+          "": [
+            "ast"
+          ],
+          "*": [
+            "abi",
+            "evm.bytecode",
+            "evm.deployedBytecode",
+            "evm.methodIdentifiers",
+            "metadata"
+          ]
+        }
+      },
+      "remappings": []
+    },
+    "sources": {
+      "project/contracts/ReputationNFT.sol": {
+        "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.30;\n\n/**\n * @title ReputationNFT\n * @dev ERC-721 NFT for student skill badges\n */\ncontract ReputationNFT {\n    string public name = \"Campus Reputation Badge\";\n    string public symbol = \"BADGE\";\n    \n    address public owner;\n    mapping(address => bool) public isIssuer;\n    \n    uint256 public nextTokenId = 1;\n    mapping(uint256 => address) public ownerOf;\n    mapping(address => uint256) public balanceOf;\n    \n    // Badge categories\n    enum Category { Math, Programming, Writing, Science, Language }\n    \n    struct Badge {\n        uint256 id;\n        address student;\n        Category category;\n        uint256 issuedDate;\n        string achievement;\n    }\n    \n    mapping(uint256 => Badge) public badges;\n    mapping(address => uint256[]) public studentBadges;\n    mapping(address => mapping(Category => uint256)) public categoryCount;\n    \n    event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);\n    event BadgeIssued(uint256 indexed tokenId, address indexed student, Category category);\n    \n    modifier onlyOwner() {\n        require(msg.sender == owner, \"Not the owner\");\n        _;\n    }\n    \n    modifier onlyIssuer() {\n        require(isIssuer[msg.sender], \"Not authorized issuer\");\n        _;\n    }\n    \n    constructor() {\n        owner = msg.sender;\n        isIssuer[msg.sender] = true;\n    }\n    \n    /**\n     * @dev Issue a badge to a student\n     */\n    function issueBadge(\n        address student,\n        Category category,\n        string memory achievement\n    ) public onlyIssuer returns (uint256) {\n        require(student != address(0), \"Invalid student address\");\n        \n        uint256 tokenId = nextTokenId++;\n        \n        ownerOf[tokenId] = student;\n        balanceOf[student]++;\n        \n        badges[tokenId] = Badge({\n            id: tokenId,\n            student: student,\n            category: category,\n            issuedDate: block.timestamp,\n            achievement: achievement\n        });\n        \n        studentBadges[student].push(tokenId);\n        categoryCount[student][category]++;\n        \n        emit Transfer(address(0), student, tokenId);\n        emit BadgeIssued(tokenId, student, category);\n        \n        return tokenId;\n    }\n    \n    /**\n     * @dev Get badge details\n     */\n    function getBadge(uint256 tokenId) public view returns (\n        address student,\n        Category category,\n        uint256 issuedDate,\n        string memory achievement\n    ) {\n        require(ownerOf[tokenId] != address(0), \"Badge does not exist\");\n        Badge memory badge = badges[tokenId];\n        return (badge.student, badge.category, badge.issuedDate, badge.achievement);\n    }\n    \n    /**\n     * @dev Get all badges for a student\n     */\n    function getStudentBadges(address student) public view returns (uint256[] memory) {\n        return studentBadges[student];\n    }\n    \n    /**\n     * @dev Get number of badges in a category for a student\n     */\n    function getCategoryCount(address student, Category category) public view returns (uint256) {\n        return categoryCount[student][category];\n    }\n    \n    /**\n     * @dev Check if student has badge in category\n     */\n    function hasCategoryBadge(address student, Category category) public view returns (bool) {\n        return categoryCount[student][category] > 0;\n    }\n    \n    /**\n     * @dev Add authorized issuer\n     */\n    function addIssuer(address issuer) public onlyOwner {\n        require(issuer != address(0), \"Invalid issuer address\");\n        isIssuer[issuer] = true;\n    }\n    \n    /**\n     * @dev Remove authorized issuer\n     */\n    function removeIssuer(address issuer) public onlyOwner {\n        isIssuer[issuer] = false;\n    }\n    \n    /**\n     * @dev Total supply of badges\n     */\n    function totalSupply() public view returns (uint256) {\n        return nextTokenId - 1;\n    }\n    \n    /**\n     * @dev Transfer badge (disabled - badges are soul-bound)\n     */\n    function transferFrom(address from, address to, uint256 tokenId) public pure {\n        revert(\"Badges are non-transferable\");\n    }\n    \n    /**\n     * @dev Safe transfer (also disabled)\n     */\n    function safeTransferFrom(address from, address to, uint256 tokenId) public pure {\n        revert(\"Badges are non-transferable\");\n    }\n}\n"
+      }
+    }
+  }
+}
