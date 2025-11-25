@@ -130,7 +130,7 @@ Main contract managing the complete bounty lifecycle:
 Open → Claimed → Submitted → Completed (or Cancelled)
 
 ### 4. EscrowManager
-Advanced escrow system with dispute resolution features (not currently integrated in frontend).
+Escrow system with dispute resolution features (not currently integrated in frontend).
 
 ---
 
@@ -498,4 +498,4 @@ For academic inquiries related to this project, please refer to the course mater
 
 **Developed by Ankur Lohachab**
 
-Built with ❤️ for blockchain education
+Built for blockchain education
