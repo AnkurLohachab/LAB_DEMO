@@ -420,7 +420,7 @@ If you face a version mismatch error between Wagmi and RainbowKit, try installin
 
 ```bash
 npm install wagmi@^2.12.0 @rainbow-me/rainbowkit@^2.2.9
-
+```
 
 
 ---
