@@ -414,6 +414,15 @@ npm start
 **Issue:** Can't claim own bounty
 **Solution:** This is intentional. Use a different account to claim.
 
+### Dependency Compatibility Note (Wagmi + RainbowKit)
+
+If you face a version mismatch error between Wagmi and RainbowKit, try installing the following compatible versions:
+
+```bash
+npm install wagmi@^2.12.0 @rainbow-me/rainbowkit@^2.2.9
+
+
+
 ---
 
 ## Key Features Implementation
@@ -449,7 +458,7 @@ The frontend adapts based on:
 - Transaction confirmation prompts
 - Error handling for failed transactions
 
-### Best Practices
+### Suggestions
 - Use test accounts for development only
 - Never commit private keys
 - Verify contract addresses before transactions
